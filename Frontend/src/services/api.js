@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -20,12 +20,14 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
 // Check if user has requested/borrowed a specific book
 export const checkRequestStatus = (bookId) => api.get(`/borrow/check-status/${bookId}`);
+
 // Analytics API (optional - for future dashboard)
 export const getAnalyticsData = (timeRange = 'month') => 
   api.get(`/analytics?range=${timeRange}`);
-// Add these to your services/api.js
+
 // Wishlist APIs
 export const getWishlist = () => api.get('/wishlist');
 export const addToWishlist = (bookId) => api.post('/wishlist', { bookId });
@@ -35,20 +37,19 @@ export const clearWishlist = () => api.delete('/wishlist');
 // Forgot password
 export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
 
-
-
 // Reset password
 export const resetPassword = (token, newPassword) => api.post('/auth/reset-password', { token, newPassword });
 
 // Update profile (name or profile picture)
 export const updateProfile = (data) => api.put('/users/profile', data);
 
-// Delete account
 // Delete account with password
 export const deleteAccount = (password) => api.delete('/users/account', { data: { password } });
+
 // Approve request with custom dates
 export const approveRequestWithDates = (requestId, issueDate, dueDate) => 
   api.put(`/borrow/approve/${requestId}`, { issueDate, dueDate });
+
 // Auth APIs
 export const register = (name, email, password, role = 'student') =>
   api.post('/auth/register', { name, email, password, role });
@@ -69,9 +70,8 @@ export const requestBorrow = (bookId) => api.post('/borrow/request', { bookId })
 export const getMyBorrows = () => api.get('/borrow/my-borrows');
 export const getPendingRequests = () => api.get('/borrow/pending');
 export const approveRequest = (requestId) => api.put(`/borrow/approve/${requestId}`);
-export const getActiveBorrows = () => api.get('/borrow/active');  // ✅ Add this
+export const getActiveBorrows = () => api.get('/borrow/active');
 export const returnBook = (borrowId) => api.put(`/borrow/return/${borrowId}`);
-// Add these to your services/api.js
 
 // Notification APIs
 export const getNotifications = () => api.get('/notifications');
@@ -79,7 +79,7 @@ export const getUnreadCount = () => api.get('/notifications/unread/count');
 export const markAsRead = (id) => api.put(`/notifications/${id}/read`);
 export const markAllAsRead = () => api.put('/notifications/read-all');
 export const deleteNotification = (id) => api.delete(`/notifications/${id}`);
-//
+
 // Quote APIs
 export const getActiveQuote = () => api.get('/quotes/active');
 export const getAllQuotes = () => api.get('/quotes/all');
@@ -90,9 +90,9 @@ export const deleteQuote = (id) => api.delete(`/quotes/${id}`);
 // User APIs
 export const getUsers = () => api.get('/users');
 
+// Category APIs
 export const getCategories = () => api.get('/categories');
 export const addCategory = (name) => api.post('/categories', { name });
 export const deleteCategory = (name) => api.delete(`/categories/${name}`);
-
 
 export default api;
