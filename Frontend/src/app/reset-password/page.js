@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { resetPassword } from "@/services/api";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -64,19 +64,14 @@ export default function ResetPasswordPage() {
         
         {message ? (
           <div className="text-center">
-            <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
-              {message}
-            </div>
+            <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4">{message}</div>
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700 mx-auto"></div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">
-                {error}
-              </div>
+              <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">{error}</div>
             )}
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
               <input
@@ -89,7 +84,6 @@ export default function ResetPasswordPage() {
               />
               <p className="text-xs text-gray-400 mt-1">Must be at least 8 characters</p>
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
               <input
@@ -100,7 +94,6 @@ export default function ResetPasswordPage() {
                 required
               />
             </div>
-            
             <button
               type="submit"
               disabled={loading}
@@ -108,7 +101,6 @@ export default function ResetPasswordPage() {
             >
               {loading ? "Resetting..." : "Reset Password"}
             </button>
-            
             <button
               type="button"
               onClick={() => router.push("/")}
@@ -120,5 +112,13 @@ export default function ResetPasswordPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
