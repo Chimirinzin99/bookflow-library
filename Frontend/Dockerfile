@@ -1,20 +1,18 @@
-# Stage 1: Build
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
+
+# Copy package files
 COPY package*.json ./
 RUN npm ci
+
+# Copy source code
 COPY . .
+
+# Build the app
 RUN npm run build
 
-# Stage 2: Production
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-
-# Copy standalone build (Next.js creates this folder)
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-
+# Expose port (Render requires 10000)
 EXPOSE 10000
-CMD ["node", "server.js"]
+
+# Start Next.js
+CMD ["npx", "next", "start", "-p", "10000"]
