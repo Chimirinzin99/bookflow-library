@@ -1,0 +1,274 @@
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+
+
+/* Light mode variables */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f5f7;
+  --bg-card: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --border-color: #e5e7eb;
+  --teal-primary: #0f766e;
+  --teal-light: #f0fdfa;
+}
+
+/* Dark mode variables */
+.dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-card: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --border-color: #374151;
+  --teal-primary: #14b8a6;
+  --teal-light: #134e4a;
+}
+
+/* Base styles */
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Utility overrides */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.bg-gray-50 {
+  background-color: #f4f5f7 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.dark .text-gray-800 {
+  color: #f9fafb !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.border-gray-100 {
+  border-color: #e5e7eb !important;
+}
+
+.dark .border-gray-100 {
+  border-color: #374151 !important;
+}
+
+/* Teal consistency */
+.bg-teal-700 {
+  background-color: #0f766e !important;
+}
+
+.dark .bg-teal-700 {
+  background-color: #0f766e !important;
+}
+
+.text-teal-700 {
+  color: #0f766e !important;
+}
+
+.dark .text-teal-700 {
+  color: #14b8a6 !important;
+}
+
+.bg-teal-50 {
+  background-color: #f0fdfa !important;
+}
+
+.dark .bg-teal-50 {
+  background-color: #134e4a !important;
+}
+
+/* Layout backgrounds */
+main {
+  background-color: #f4f5f7 !important;
+}
+
+.dark main {
+  background-color: #111827 !important;
+}
+
+aside {
+  background-color: #ffffff !important;
+}
+
+.dark aside {
+  background-color: #1f2937 !important;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Input styles */
+.dark input,
+.dark textarea,
+.dark select {
+  color: #ffffff !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder,
+.dark select::placeholder {
+  color: #9ca3af !important;
+}
+
+/* FORCE TABLE TEXT TO BE BLACK IN LIGHT MODE - ADD THIS */
+table tbody tr td {
+  color: #1f2937 !important;
+}
+
+.dark table tbody tr td {
+  color: #f3f4f6 !important;
+}
+
+td.px-4.py-3.text-sm {
+  color: #1f2937 !important;
+}
+
+.dark td.px-4.py-3.text-sm {
+  color: #f3f4f6 !important;
+}
+
+td.px-4.py-3.text-sm.font-medium {
+  color: #000000 !important;
+}
+
+.dark td.px-4.py-3.text-sm.font-medium {
+  color: #ffffff !important;
+}
+/* Fix search input text color */
+input {
+  color: #1f2937 !important;
+}
+
+.dark input {
+  color: #ffffff !important;
+}
+
+/* Fix placeholder color */
+input::placeholder {
+  color: #6b7280 !important;
+}
+
+.dark input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Fix table header text */
+th {
+  color: #1f2937 !important;
+}
+
+.dark th {
+  color: #d1d5db !important;
+}
+
+/* Fix table cell text */
+td {
+  color: #1f2937 !important;
+}
+
+.dark td {
+  color: #d1d5db !important;
+}
+/* Fix dark mode button hover - no white background */
+.dark button:not(.bg-teal-700):hover {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Fix light mode button hover */
+button:not(.bg-teal-700):hover {
+  background-color: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
+/* Active tab styling */
+button.bg-teal-700 {
+  background-color: #0f766e !important;
+  color: white !important;
+}
+
+.dark button.bg-teal-700 {
+  background-color: #0f766e !important;
+  color: white !important;
+}
+/* Force sidebar button active state */
+aside nav button.bg-gray-800,
+aside nav button.bg-gray-800:hover {
+  background-color: #1f2937 !important;
+  color: white !important;
+}
+
+.dark aside nav button.bg-gray-800,
+.dark aside nav button.bg-gray-800:hover {
+  background-color: #1f2937 !important;
+  color: white !important;
+}
+
+/* Prevent any hover from overriding active state */
+aside nav button.bg-gray-800:hover {
+  background-color: #1f2937 !important;
+}
