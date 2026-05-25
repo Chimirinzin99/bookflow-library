@@ -347,7 +347,7 @@ export default function AdminDashboard({ user, activeTab: propActiveTab }) {
           </div>
         )}
 
-        {/* Issued Books Tab */}
+        
        {/* Issued Books Tab */}
 {activeTab === "issued" && (
   <div className="p-6">
@@ -595,16 +595,16 @@ export default function AdminDashboard({ user, activeTab: propActiveTab }) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section *</label>
                   <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)} className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-900 dark:text-white" required>
-                    <option value="Fiction">📚 Fiction</option>
-                    <option value="Non-Fiction">📖 Non-Fiction</option>
-                    <option value="Science">🔬 Science</option>
-                    <option value="History">📜 History</option>
-                    <option value="Children">👶 Children</option>
-                    <option value="Fantasy">✨ Fantasy</option>
-                    <option value="Mystery">🕵️ Mystery</option>
-                    <option value="Biography">👤 Biography</option>
-                    <option value="Romance">💕 Romance</option>
-                    <option value="Thriller">🔪 Thriller</option>
+                    <option value="Fiction"> Fiction</option>
+                    <option value="Non-Fiction"> Non-Fiction</option>
+                    <option value="Science"> Science</option>
+                    <option value="History"> History</option>
+                    <option value="Children"> Children</option>
+                    <option value="Fantasy"> Fantasy</option>
+                    <option value="Mystery"> Mystery</option>
+                    <option value="Biography"> Biography</option>
+                    <option value="Romance"> Romance</option>
+                    <option value="Thriller"> Thriller</option>
                   </select>
                 </div>
               </div>

@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { requestBorrow, addToWishlist, removeFromWishlist, getWishlist, checkRequestStatus } from "@/services/api";
 import { showSuccessToast, showErrorToast } from "@/components/CustomToast";
 
-
 export default function BookModal({ book, onClose, user, setShowLogin }) {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [requestStatus, setRequestStatus] = useState(null);
+  const [isRequesting, setIsRequesting] = useState(false); // NEW: Loading state for request
 
   // Check if book is in wishlist
   useEffect(() => {
@@ -35,60 +35,76 @@ export default function BookModal({ book, onClose, user, setShowLogin }) {
   };
 
   // Add to wishlist
- const handleWishlist = async () => {
-  if (!user) {
-    setShowLogin(true);
-    onClose();
-    return;
-  }
-  
-  try {
-    if (isInWishlist) {
-      await removeFromWishlist(book.id);
-      setIsInWishlist(false);
-      toast.success("❌ Removed from wishlist");
-    } else {
-      await addToWishlist(book.id);
-      setIsInWishlist(true);
-      toast.success("❤️ Added to wishlist!");
+  const handleWishlist = async () => {
+    if (!user) {
+      setShowLogin(true);
+      onClose();
+      return;
     }
-  } catch (error) {
-    toast.error("Error: " + error.response?.data?.error);
-  }
-};
+    
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(book.id);
+        setIsInWishlist(false);
+        showSuccessToast("❌ Removed from wishlist");
+      } else {
+        await addToWishlist(book.id);
+        setIsInWishlist(true);
+        showSuccessToast("❤️ Added to wishlist!");
+      }
+    } catch (error) {
+      showErrorToast("Error: " + error.response?.data?.error);
+    }
+  };
 
-const handleRequest = async () => {
-  if (!user) {
-    setShowLogin(true);
-    onClose();
-    return;
-  }
-  try {
-    await requestBorrow(book.id);
-    setRequestStatus('pending');
-    showSuccessToast(" Borrow request sent to librarian!");
-    onClose();
-  } catch (error) {
-    const errorMsg = error.response?.data?.error;
-    if (errorMsg?.includes('already requested')) {
+  // UPDATED: Handle request with loading state
+  const handleRequest = async () => {
+    if (!user) {
+      setShowLogin(true);
+      onClose();
+      return;
+    }
+    
+    // Prevent double clicking
+    if (isRequesting) return;
+    
+    setIsRequesting(true); // Show "Requesting..." state
+    
+    try {
+      await requestBorrow(book.id);
       setRequestStatus('pending');
-      showErrorToast(" You already requested this book! Please wait for admin approval.");
-    } else if (errorMsg?.includes('already borrowing')) {
-      setRequestStatus('active');
-      showErrorToast(" You are already borrowing this book! Return it first to request again.");
-    } else if (errorMsg?.includes('Not available')) {
-      showErrorToast("❌ This book is currently borrowed by someone else.");
-    } else {
-      showErrorToast("Request failed: " + (errorMsg || "Unknown error"));
+      showSuccessToast("✅ Borrow request sent to librarian!");
+      setTimeout(() => onClose(), 1500); // Close modal after success
+    } catch (error) {
+      const errorMsg = error.response?.data?.error;
+      if (errorMsg?.includes('already requested')) {
+        setRequestStatus('pending');
+        showErrorToast(" You already requested this book! Please wait for admin approval.");
+      } else if (errorMsg?.includes('already borrowing')) {
+        setRequestStatus('active');
+        showErrorToast(" You are already borrowing this book! Return it first to request again.");
+      } else if (errorMsg?.includes('Not available')) {
+        showErrorToast("❌ This book is currently borrowed by someone else.");
+      } else {
+        showErrorToast("Request failed: " + (errorMsg || "Unknown error"));
+      }
+    } finally {
+      setIsRequesting(false); // Reset button state
     }
-  }
-};
-
-
+  };
 
   if (!book) return null;
 
   const getRequestButton = () => {
+    // Show loading state first
+    if (isRequesting) {
+      return {
+        text: " Requesting...",
+        className: "bg-teal-400 text-white cursor-wait",
+        disabled: true
+      };
+    }
+    
     if (requestStatus === 'pending') {
       return {
         text: " Requested - Pending",
@@ -109,8 +125,8 @@ const handleRequest = async () => {
       };
     } else {
       return {
-        text: " Request to Borrow",
-        className: "bg-teal-700 text-white ",
+        text: "📚 Request to Borrow",
+        className: "bg-teal-700 text-white hover:bg-teal-800",
         disabled: false
       };
     }
@@ -149,7 +165,7 @@ const handleRequest = async () => {
                 <button 
                   onClick={handleRequest} 
                   disabled={requestButton.disabled}
-                  className={`flex-1 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium  ${requestButton.className}`}
+                  className={`flex-1 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${requestButton.className}`}
                 >
                   {requestButton.text}
                 </button>
@@ -159,12 +175,12 @@ const handleRequest = async () => {
                     isInWishlist ? "bg-red-50 text-red-600 border-2 border-red-300" : "border-2 border-teal-700 text-teal-700 hover:bg-teal-50"
                   }`}
                 >
-                  {isInWishlist ? "❤️ In Wishlist" : "❤️ Wishlist"}
+                  {isInWishlist ? "❤️ In Wishlist" : "🤍 Wishlist"}
                 </button>
               </div>
               
               {requestStatus === 'pending' && (
-                <p className="text-xs text-yellow-600 mt-3 text-center ">
+                <p className="text-xs text-yellow-600 mt-3 text-center">
                    Your request is pending. Wait for admin approval.
                 </p>
               )}
