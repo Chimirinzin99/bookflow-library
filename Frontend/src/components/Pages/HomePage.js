@@ -32,15 +32,16 @@ export default function HomePage({ onBookClick, setActivePage }) {
   }, []);
 
   useEffect(() => {
-    if (activeCategory === "All") {
-      setFilteredBooks(books);
-    } else {
-      setFilteredBooks(books.filter(book =>
-        book.category?.toLowerCase() === activeCategory.toLowerCase() ||
-        book.section?.toLowerCase() === activeCategory.toLowerCase()
-      ));
-    }
-  }, [activeCategory, books]);
+  if (activeCategory === "All") {
+    setFilteredBooks(books);
+  } else {
+    setFilteredBooks(books.filter(book => {
+      // Check both category and section fields
+      const bookSection = (book.section || book.category || "").toLowerCase();
+      return bookSection === activeCategory.toLowerCase();
+    }));
+  }
+}, [activeCategory, books]);
 
   const loadBooks = async () => {
     try {
