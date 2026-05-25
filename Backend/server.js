@@ -7,7 +7,7 @@ const wishlistRoutes = require('./routes/wishlist');
 
 const app = express();
 
-// ✅ FIXED CORS - Allow specific origins
+// ✅ FIXED CORS Configuration - No wildcard issues
 const allowedOrigins = [
   'https://bookflow-frontend.onrender.com',
   'http://localhost:3000',
@@ -31,19 +31,22 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Handle preflight requests explicitly
-app.options('*', cors());
+// ✅ Handle preflight requests - CORRECT WAY (no bare '*')
+app.options('/*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(200);
+});
 
 // Middleware - ADD PAYLOAD SIZE LIMITS
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Routes - MOVED CATEGORIES ROUTES AFTER CORS
+// Routes
 const categoriesRoutes = require('./routes/categories');
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/wishlist', wishlistRoutes);
-
-// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/books', require('./routes/books'));
 app.use('/api/borrow', require('./routes/borrow'));
@@ -73,7 +76,7 @@ startScheduler();
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API available at http://localhost:${PORT}`);
-  console.log(`CORS enabled for: ${allowedOrigins.join(', ')}`);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`📚 API available at http://localhost:${PORT}`);
+  console.log(`🔗 CORS enabled for: ${allowedOrigins.join(', ')}`);
 });
