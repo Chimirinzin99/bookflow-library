@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -7,13 +6,41 @@ const { authMiddleware, isLibrarian } = require('./middleware/auth');
 const wishlistRoutes = require('./routes/wishlist');
 
 const app = express();
-const categoriesRoutes = require('./routes/categories');
-app.use('/api/categories', categoriesRoutes);
+
+// ✅ FIXED CORS - Allow specific origins
+const allowedOrigins = [
+  'https://bookflow-frontend.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5000'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Handle preflight requests explicitly
+app.options('*', cors());
 
 // Middleware - ADD PAYLOAD SIZE LIMITS
-app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Routes - MOVED CATEGORIES ROUTES AFTER CORS
+const categoriesRoutes = require('./routes/categories');
+app.use('/api/categories', categoriesRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 
 // Routes
@@ -48,4 +75,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API available at http://localhost:${PORT}`);
+  console.log(`CORS enabled for: ${allowedOrigins.join(', ')}`);
 });
