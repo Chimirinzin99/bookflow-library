@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
     const books = await Book.getAll(category);
     res.json(books);
   } catch (error) {
+    console.error('Get books error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -25,11 +26,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Add book (librarian only) - FIXED: use 'section' not 'category'
+// Add book (librarian only) - FIXED to use 'section'
 router.post('/', authMiddleware, isLibrarian, async (req, res) => {
   try {
-    const { title, author, img, description, year, section } = req.body;  // ← Changed 'category' to 'section'
-    console.log("📚 Received section:", section);  // Debug log
+    const { title, author, img, description, year, section } = req.body;
+    console.log("📚 Received section:", section);
     
     const book = await Book.create(title, author, img, description, year, section);
     res.json(book);

@@ -3,13 +3,12 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { Moon, Sun } from "lucide-react";
 import { showLogoutToast } from "@/components/CustomToast";
-import {  AlertCircle, Library,  } from "lucide-react";
+import { AlertCircle, Library } from "lucide-react";
 import { showSuccessToast, showErrorToast } from "@/components/CustomToast";
 
 import {
   LayoutDashboard,
   BookMarked,
-  Clock,
   AlertOctagon,
   Users,
   Home,
@@ -25,6 +24,8 @@ import {
   ScrollText,
 } from "lucide-react";
 
+// IMPORTANT: Use your actual backend URL
+const API_BASE_URL = 'https://bookflow-backend-drvt.onrender.com/api';
 
 export default function Sidebar({ activePage, setActivePage, user, setShowLogin, setShowRegister, setUser }) {
   const [stats, setStats] = useState({
@@ -37,13 +38,13 @@ export default function Sidebar({ activePage, setActivePage, user, setShowLogin,
   const { darkMode, toggleDarkMode } = useTheme();
   
 
-const handleLogout = () => {
-  const userName = user?.name || "User";
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  setUser(null);
-  showLogoutToast(userName);
-};
+  const handleLogout = () => {
+    const userName = user?.name || "User";
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    showLogoutToast(userName);
+  };
 
   // Fetch REAL stats from database
   useEffect(() => {
@@ -60,21 +61,21 @@ const handleLogout = () => {
       console.log("Fetching stats...");
       
       // 1. Get total books count
-      const booksRes = await fetch('http://localhost:5000/api/books', {
+      const booksRes = await fetch(`${API_BASE_URL}/books`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const books = await booksRes.json();
       const booksArray = Array.isArray(books) ? books : [];
       
       // 2. Get all users
-      const usersRes = await fetch('http://localhost:5000/api/users', {
+      const usersRes = await fetch(`${API_BASE_URL}/users`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const users = await usersRes.json();
       const usersArray = Array.isArray(users) ? users : [];
       
       // 3. Get active borrows
-      const borrowsRes = await fetch('http://localhost:5000/api/borrow/active', {
+      const borrowsRes = await fetch(`${API_BASE_URL}/borrow/active`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const activeBorrows = await borrowsRes.json();
@@ -157,112 +158,100 @@ const handleLogout = () => {
 
         {/* User Info */}
         {user && (
-  <div className="mx-3 mt-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800/60 shadow-sm overflow-hidden">
-    <div className="flex items-center gap-3 p-3">
-      {/* Avatar */}
-      <div className="relative flex-shrink-0">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-bold text-sm shadow-md">
-          {user.name?.charAt(0).toUpperCase() || "U"}
-        </div>
-        {/* Online dot */}
-        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full" />
-      </div>
-
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-gray-800 dark:text-white truncate leading-tight">
-          {user.name}
-        </p>
-        <span className="inline-flex items-center mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 capitalize">
-          {user.role}
-        </span>
-      </div>
-    
+          <div className="mx-3 mt-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800/60 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 p-3">
+              <div className="relative flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-gray-800 dark:text-white truncate leading-tight">
+                  {user.name}
+                </p>
+                <span className="inline-flex items-center mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 capitalize">
+                  {user.role}
+                </span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Admin Stats Cards - Only visible to librarians */}
-       {/* Admin Stats Cards - Gray in Light Mode, Dark Mode as is */}
-{isLibrarian && (
-  <div className="px-3 py-4 space-y-3">
-    <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2">Overview</p>
-    
-    {/* Issued Books */}
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.issuedBooks}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Issued Books</p>
-        </div>
-        <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-teal-900/30 flex items-center justify-center">
-          <BookOpen size={20} className="text-gray-600 dark:text-teal-400" />
-        </div>
-      </div>
-    </div>
-    
-  
-    
-    {/* Overdue */}
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.overdue}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Overdue</p>
-        </div>
-        <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-red-900/30 flex items-center justify-center">
-          <AlertCircle size={20} className="text-gray-600 dark:text-red-400" />
-        </div>
-      </div>
-    </div>
-    
-    {/* Total Books */}
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalBooks}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Total Books</p>
-        </div>
-        <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-blue-900/30 flex items-center justify-center">
-          <Library size={20} className="text-gray-600 dark:text-blue-400" />
-        </div>
-      </div>
-    </div>
-    
-    {/* Users */}
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalStudents}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Users</p>
-        </div>
-        <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-green-900/30 flex items-center justify-center">
-          <Users size={20} className="text-gray-600 dark:text-green-400" />
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+        {/* Admin Stats Cards */}
+        {isLibrarian && (
+          <div className="px-3 py-4 space-y-3">
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2">Overview</p>
+            
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.issuedBooks}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Issued Books</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-teal-900/30 flex items-center justify-center">
+                  <BookOpen size={20} className="text-gray-600 dark:text-teal-400" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.overdue}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Overdue</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-red-900/30 flex items-center justify-center">
+                  <AlertCircle size={20} className="text-gray-600 dark:text-red-400" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalBooks}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Books</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-blue-900/30 flex items-center justify-center">
+                  <Library size={20} className="text-gray-600 dark:text-blue-400" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalStudents}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Users</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gray-200/50 dark:bg-green-900/30 flex items-center justify-center">
+                  <Users size={20} className="text-gray-600 dark:text-green-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Navigation Menu - Only for students */}
-{!isLibrarian && (
-  <nav className="p-3 space-y-1 mt-2">
-    {menuItems.map((item) => (
-      <button
-        key={item.id}
-        onClick={() => setActivePage(item.id)}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${
-          activePage === item.id
-            ? "bg-gray-800 text-white shadow-md hover:bg-gray-800"
-            : "text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-        }`}
-      >
-        <span className="flex-shrink-0">{item.icon}</span>
-        <span className="text-sm font-medium">{item.label}</span>
-      </button>
-    ))}
-  </nav>
-)}
+        {!isLibrarian && (
+          <nav className="p-3 space-y-1 mt-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActivePage(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${
+                  activePage === item.id
+                    ? "bg-gray-800 text-white shadow-md hover:bg-gray-800"
+                    : "text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                <span className="flex-shrink-0">{item.icon}</span>
+                <span className="text-sm font-medium">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        )}
 
         {/* Footer Links */}
         <div className="px-4 py-4 mt-4 border-t border-gray-100 dark:border-gray-700">
@@ -305,26 +294,25 @@ const handleLogout = () => {
             </button>
           </div>
         ) : (
-         <button
-  onClick={handleLogout}
-  className="w-full flex items-center justify-center gap-2
-  bg-white dark:bg-gray-800/80
-  text-gray-600 dark:text-gray-300
-  border border-gray-200 dark:border-gray-600
-  py-3 rounded-2xl
-  hover:bg-red-50 dark:hover:bg-red-900/20
-  hover:border-red-300 dark:hover:border-red-700
-  hover:text-red-600 dark:hover:text-red-400
-  transition-all duration-300
-  font-medium text-sm shadow-sm hover:shadow-md group"
->
-  <LogOut
-    size={16}
-    className="group-hover:-translate-x-1 transition-transform duration-300"
-  />
-
-  Logout
-</button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2
+            bg-white dark:bg-gray-800/80
+            text-gray-600 dark:text-gray-300
+            border border-gray-200 dark:border-gray-600
+            py-3 rounded-2xl
+            hover:bg-red-50 dark:hover:bg-red-900/20
+            hover:border-red-300 dark:hover:border-red-700
+            hover:text-red-600 dark:hover:text-red-400
+            transition-all duration-300
+            font-medium text-sm shadow-sm hover:shadow-md group"
+          >
+            <LogOut
+              size={16}
+              className="group-hover:-translate-x-1 transition-transform duration-300"
+            />
+            Logout
+          </button>
         )}
       </div>
     </aside>
