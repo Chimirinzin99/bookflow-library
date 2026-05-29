@@ -282,7 +282,7 @@ export default function Sidebar({ activePage, setActivePage, user, setShowLogin,
           <div className="space-y-2">
             <button
               onClick={() => setShowLogin(true)}
-              className="w-full flex items-center justify-center gap-2 bg-teal-700 text-white py-2.5 rounded-lg hover:bg-teal-800 transition-all duration-300 font-medium text-sm"
+              className="w-full flex items-center justify-center gap-2 bg-red-700 text-white py-2.5 rounded-lg hover:bg-teal-800 transition-all duration-300 font-medium text-sm"
             >
               <LogIn size={16} strokeWidth={1.8} /> Log in
             </button>
